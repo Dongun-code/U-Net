@@ -15,7 +15,6 @@ class Backbone:
         self.conv2d = CustomConv2d(kernel_size=3, strides=1)
         self.conv2dup = CustomConv2dup(kernel_size=2, strides=1)
 
-
     def Maxpooling(self, x):
         x = layers.MaxPooling2D(pool_size=(2, 2))(x)
         return x
@@ -25,7 +24,7 @@ class Backbone:
         return x
 
     def conv2d_k1(self, x):
-            x = layers.Conv2D(1, 1, activation="sigmoid")(x)
+            x = layers.Conv2D(1, 1, activation="softmax")(x)
             return x
 
 
@@ -74,10 +73,8 @@ class Unet(Backbone):
 
         up9 = self.conv2dup(up8, 64)
         merge3 = layers.concatenate([down1, up9])
-        up10 = self.conv2d(merge3, 64)
-        up11 = self.conv2d(up10, 64)
-        up12 = self.conv2d(up11, 2)
-        output = self.conv2d_k1(up12)
+        up10 = self.conv2d(merge3, 13)
+        output = layers.Conv2D(13, 1, activation="softmax")(up10)
 
         model = tf.keras.Model(inputs = input, outputs=output)
         return model
