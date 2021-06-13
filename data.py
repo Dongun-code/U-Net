@@ -6,6 +6,7 @@ import glob
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+import pandas as pd
 from sklearn.cluster import KMeans
 
 class data_factory:
@@ -13,6 +14,7 @@ class data_factory:
         if dataset == "cityspace":
             return CitySpace()
 
+    
 class CitySpace():
     def kmeans(self, img_list):
         img_list.sort()
@@ -23,7 +25,6 @@ class CitySpace():
             img = self.cut_img(img)
             mask = img[:,256:, :]
             mask = mask / 255
-
             mask_list.append(mask.reshape(mask.shape[0]*mask.shape[1], 3))
 
         mask_list = np.array(mask_list)
@@ -87,6 +88,7 @@ class CitySpace():
         axes[0].imshow(result)
         axes[1].imshow(train_mask[50])
         plt.show()
+
 
 
 if __name__ == "__main__":
