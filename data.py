@@ -22,10 +22,16 @@ class CitySpace():
         self.obj_color = cfg.COLOR
         self.input_shape = cfg.Model.input_shape
 
-    def img_process(self, img):
-        pass
-    
-    def label_process(self, label):
+    def img_process(self, file_list):
+        for file in file_list:
+            img = Image.open(file)
+            img = img.resize((cfg.Model.input_shape[1], cfg.Model.input_shape[0]))
+            img = np.array(img)
+            # img = Image.fromarray(img)
+            plt.imshow(img)
+            plt.show()
+
+    def label_process(self, file_list):
         pass
 
     def get_data(self, path_, split):
@@ -41,7 +47,7 @@ class CitySpace():
             data_list = glob.glob(path)
             data_list.sort()
             file_list.extend(data_list)
-
+        
         print("file shape : ", np.array(file_list).shape)
         if "leftImg8bit" in path_:
             self.img_process(file_list)
@@ -49,12 +55,12 @@ class CitySpace():
             self.label_process(file_list)
 
 
-        return file_list
+        # return file_list
         
 
     def __call__(self, path):
 
-        train = self.get_data(self.data_path, "train")
+        self.get_data(self.data_path, "train")
 
 
 

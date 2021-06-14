@@ -18,7 +18,6 @@ class Config:
         pass
 
     class Model:
-
         input_shape = (256, 512)
         model = "unet"
         batch_size = 2
