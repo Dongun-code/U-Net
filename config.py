@@ -17,6 +17,9 @@ class Config:
     class Tfrecord:
         pass
 
+    class CitySpace:
+        resolution = (1024, 2048)
+
     class Model:
         input_shape = (256, 512)
         model = "unet"

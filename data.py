@@ -1,12 +1,14 @@
 import os.path as op
 # import tensorflow as tf
 from config import Config as cfg
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageDraw
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 import pandas as pd
+import json
+
 # from sklearn.cluster import KMeans
 
 class data_factory:
@@ -14,7 +16,7 @@ class data_factory:
         if dataset == "cityspace":
             return CitySpace()
 
-    
+
 class CitySpace():
     def __init__(self):
         self.data_path = cfg.CITY_DATA
@@ -27,14 +29,50 @@ class CitySpace():
             img = Image.open(file)
             img = img.resize((cfg.Model.input_shape[1], cfg.Model.input_shape[0]))
             img = np.array(img)
-            # img = Image.fromarray(img)
-            plt.imshow(img)
-            plt.show()
+        # return img
 
-    def label_process(self, file_list):
-        pass
 
-    def get_data(self, path_, split):
+    def label_process(self, file_list, data_name):
+        if data_name == "cityspace":
+            img_shape = cfg.CitySpace.resolution
+        else:
+            raise NameError(f"[Dataset] invalid dataset name: {data_name}")
+        for file in file_list:
+            use_index = set()
+            with open(file) as json_file:
+                label = json.load(json_file)
+            labels = label['objects']
+            mask = Image.new('L', (img_shape[1], img_shape[0]), 0)
+            for label in labels:
+                name = label['label']
+                if name in cfg.USE_CATEGORY:
+                    poly = []
+                    polygon = label['polygon']
+                    for ob in polygon:
+                        poly.append((ob[0], ob[1]))
+                    use_index.add(cfg.COLOR[name])
+                    ImageDraw.Draw(mask).polygon(poly, outline=cfg.COLOR[name], fill=cfg.COLOR[name])
+            mask = mask.resize((cfg.Model.input_shape[1], cfg.Model.input_shape[0]))
+            split_mask = self.split_mask(mask, use_index)
+
+
+    def split_mask(self, mask, use_index):
+        split_mask = np.zeros((cfg.Model.input_shape[0], cfg.Model.input_shape[1], len(cfg.USE_CATEGORY)))
+        mask = np.array(mask)
+        print('origin : ', split_mask.shape)
+        for index in use_index:
+            #   must think class order
+            color = (mask == index)
+
+            if index == 15:
+                split_mask[:, :, 0] = np.where(color, 15, 0)
+            if index == 25:
+                split_mask[:, :, 1] = np.where(color, 25, 0)
+            if index == 65:
+                split_mask[:, :, 2] = np.where(color, 65, 0)
+        return split_mask
+
+    def get_data(self, path_, split, data_name):
         path = op.join(path_, split, "*")
         folder = glob.glob(path)
         folder.sort()
@@ -52,7 +90,9 @@ class CitySpace():
         if "leftImg8bit" in path_:
             self.img_process(file_list)
         elif "gtFine" in path_:
-            self.label_process(file_list)
+            self.label_process(file_list, data_name)
+        
+
 
 
         # return file_list
@@ -60,7 +100,9 @@ class CitySpace():
 
     def __call__(self, path):
 
-        self.get_data(self.data_path, "train")
+        # self.get_data(self.data_path, "train", "cityspace")
+        self.get_data(self.label_path, "train", "cityspace")
+
 
 
 
