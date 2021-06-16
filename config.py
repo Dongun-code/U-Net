@@ -7,6 +7,7 @@ class Config:
     CITY_DATA = op.join(RESULT_ROOT,"leftImg8bit")
     CITY_DATA_LABEL = op.join(RESULT_ROOT,"gt","gtFine")
     USE_CATEGORY = ['car', 'road', 'person']
+    SHARD = 4000
     COLOR = {'car' : 15,
             'road' : 25,
             'traffic sign' : 35,
