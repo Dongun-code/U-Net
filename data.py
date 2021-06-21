@@ -2,6 +2,7 @@ import os.path as op
 # import tensorflow as tf
 from config import Config as cfg
 from PIL import Image, ImageOps, ImageDraw
+from tfrecord.tfrecord_writter import tfrecord_writer
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,6 +26,7 @@ class CitySpace():
         self.input_shape = cfg.Model.input_shape
 
     def img_process(self, file_list):
+        print("Start get img")
         for file in file_list:
             img = Image.open(file)
             img = img.resize((cfg.Model.input_shape[1], cfg.Model.input_shape[0]))
@@ -32,6 +34,7 @@ class CitySpace():
         return img / 255
 
     def label_process(self, file_list, data_name):
+        print("Start get mask")
         if data_name == "cityspace":
             resolution = cfg.CitySpace.resolution
         else:
@@ -53,7 +56,7 @@ class CitySpace():
                     use_index.add(cfg.COLOR[name])
                     ImageDraw.Draw(mask).polygon(poly, outline=cfg.COLOR[name], fill=cfg.COLOR[name])
             split_mask = self.split_mask(mask, use_index)
-
+            return (mask, split_mask)
             # plt.imshow(mask)
             # plt.show()
 
@@ -90,21 +93,27 @@ class CitySpace():
         
         print("file shape : ", np.array(file_list).shape)
         if "leftImg8bit" in path_:
-            self.img_process(file_list)
+            output = self.img_process(file_list)
         elif "gtFine" in path_:
-            self.label_process(file_list, data_name)
-        
+            output = self.label_process(file_list, data_name)
+        return output
 
-    def __call__(self, path):
+    def __call__(self):
 
-        # self.get_data(self.data_path, "train", "cityspace")
-        self.get_data(self.label_path, "train", "cityspace")
+        train_img = self.get_data(self.data_path, "train", "cityspace")
+        train_label = self.get_data(self.label_path, "train", "cityspace")
+        # val_dataset = self.get_data(self.label_path, "val", "cityspace")
+        # test_dataset = self.get_data(self.label_path, "test", "cityspace")
+        print("Write Start!")
+        tfw = tfrecord_writer()
+        tfw.make_tfrecord((train_img, train_label), "cityspace", "train", cfg.TFRECORD)
+
 
 
 
 if __name__ == "__main__":
     city = CitySpace()
-    city(cfg.CITY_DATA)
+    city()
 
 
 

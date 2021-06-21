@@ -4,13 +4,15 @@ import numpy as np
 
 class TfSerializer:
     def __call__(self, raw_example):
-        features = self.convert_to_features()
+        features = self.convert_to_features(raw_example)
 
         features = tf.train.Features(feature=features)
 
         tf_example = tf.train.Example(features = features)
 
         serialized = tf_example.SerializeToString()
+
+        return serialized
 
     def convert_to_features(self, raw_example):
         features = dict()
@@ -33,7 +35,7 @@ class TfSerializer:
                 features[key] = self._float_feature(value)
             else:
                 assert 0, f"[convert_to_feature] Wrong data type: {type(value)}"
-
+        return features
 
     @classmethod
     def _bytes_feature(value):
