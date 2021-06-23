@@ -26,15 +26,19 @@ class CitySpace():
         self.input_shape = cfg.Model.input_shape
 
     def img_process(self, file_list):
+        output = []
         print("Start get img")
         for file in file_list:
             img = Image.open(file)
             img = img.resize((cfg.Model.input_shape[1], cfg.Model.input_shape[0]))
             img = np.array(img)
-        return img / 255
+            output.append(img / 255)
+        return output
 
     def label_process(self, file_list, data_name):
         print("Start get mask")
+        mask_list = []
+        split_mask_list = []
         if data_name == "cityspace":
             resolution = cfg.CitySpace.resolution
         else:
@@ -42,6 +46,7 @@ class CitySpace():
             
         for file in file_list:
             use_index = set()
+
             with open(file) as json_file:
                 label = json.load(json_file)
             labels = label['objects']
@@ -56,7 +61,11 @@ class CitySpace():
                     use_index.add(cfg.COLOR[name])
                     ImageDraw.Draw(mask).polygon(poly, outline=cfg.COLOR[name], fill=cfg.COLOR[name])
             split_mask = self.split_mask(mask, use_index)
-            return (mask, split_mask)
+            split_mask = np.array(split_mask)
+            mask = np.array(mask)
+            split_mask_list.append(split_mask)
+            mask_list.append(mask)
+        return mask_list, split_mask_list
             # plt.imshow(mask)
             # plt.show()
 
@@ -66,7 +75,7 @@ class CitySpace():
         '''
         split_mask = np.zeros((cfg.Model.input_shape[0], cfg.Model.input_shape[1], len(cfg.USE_CATEGORY)))
         mask = np.array(mask)
-        print('origin : ', split_mask.shape)
+        # print('origin : ', split_mask.shape)
         for index in use_index:
             color = (mask == index)
             if index == 15:
@@ -101,12 +110,16 @@ class CitySpace():
     def __call__(self):
 
         train_img = self.get_data(self.data_path, "train", "cityspace")
-        train_label = self.get_data(self.label_path, "train", "cityspace")
+        # print(np.array(train_img).shape)
+        mask, split_mask = train_label = self.get_data(self.label_path, "train", "cityspace")
+        print(np.array(mask).shape)
+        print(np.array(split_mask).shape)
+        # print(np.array(train_label).shape)
         # val_dataset = self.get_data(self.label_path, "val", "cityspace")
         # test_dataset = self.get_data(self.label_path, "test", "cityspace")
-        print("Write Start!")
-        tfw = tfrecord_writer()
-        tfw.make_tfrecord((train_img, train_label), "cityspace", "train", cfg.TFRECORD)
+        np.savez("./train_img", img = train_img)
+        np.savez("./train_label", label = mask, masket=split_mask)
+
 
 
 

@@ -20,7 +20,7 @@ class model_factory:
     def get_model(self):
         model = self.choose_backbone(self.backbone)
         model = model.get_model(self.input_shape, self.batch_size)
-        model.compile(optimizer= optimizers.Adam(lr = 1e-4), loss='categorical_crossentropy', metrics=['accuracy'])
+        model.compile(optimizer= optimizers.Adam(lr = 1e-4), loss='SparseCategoricalCrossentropy', metrics=['accuracy', 'mse'])
         model.summary()
         print("out")
         return model

@@ -74,7 +74,7 @@ class Unet(Backbone):
         up9 = self.conv2dup(up8, 64)
         merge3 = layers.concatenate([down1, up9])
         up10 = self.conv2d(merge3, 13)
-        output = layers.Conv2D(13, 1, activation="softmax")(up10)
+        output = layers.Conv2D(3, 1, activation="softmax")(up10)
 
         model = tf.keras.Model(inputs = input, outputs=output)
         return model
