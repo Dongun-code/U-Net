@@ -7,6 +7,7 @@ class Config:
     CITY_DATA = op.join(RESULT_ROOT,"leftImg8bit")
     CITY_DATA_LABEL = op.join(RESULT_ROOT,"gt","gtFine")
     USE_CATEGORY = ['car', 'road', 'person']
+    HARD_ROOT = "/media/milab/My Passport3/Dongun/Segmentation_data"
     SHARD = 4000
     COLOR = {'car' : 15,
             'road' : 25,
@@ -22,6 +23,7 @@ class Config:
         resolution = (1024, 2048)
 
     class Model:
+        img_shape = (256, 512, 3)
         input_shape = (256, 512)
         model = "unet"
         batch_size = 2

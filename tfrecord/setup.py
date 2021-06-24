@@ -37,11 +37,9 @@ class TfSerializer:
                 assert 0, f"[convert_to_feature] Wrong data type: {type(value)}"
         return features
 
-    @classmethod
+    @staticmethod
     def _bytes_feature(value):
         """Returns a bytes_list from a string / byte."""
-        # if isinstance(value, type(tf.constant(0))):
-        value = value.numpy() # BytesList won't unpack a string from an EagerTensor.
         return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
     @classmethod

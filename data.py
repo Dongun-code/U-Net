@@ -109,16 +109,19 @@ class CitySpace():
 
     def __call__(self):
 
-        train_img = self.get_data(self.data_path, "train", "cityspace")
-        # print(np.array(train_img).shape)
-        mask, split_mask = train_label = self.get_data(self.label_path, "train", "cityspace")
-        print(np.array(mask).shape)
-        print(np.array(split_mask).shape)
+        # val_img = self.get_data(self.data_path, "val", "cityspace")
+        # val_mask, val_split_mask = train_label = self.get_data(self.label_path, "val", "cityspace")
+        # np.savez("/media/milab/My Passport3/Dongun/Segmentation_data/val_img", img = val_img)
+        # np.savez("/media/milab/My Passport3/Dongun/Segmentation_data/val_label", label = val_mask, masket=val_split_mask)
+        print("start test")
+        test_img = self.get_data(self.data_path, "test", "cityspace")
+        test_mask, test_split_mask = train_label = self.get_data(self.label_path, "test", "cityspace")
+        np.savez("/media/milab/My Passport3/Dongun/Segmentation_data/test_img", img = test_img)
+        np.savez("/media/milab/My Passport3/Dongun/Segmentation_data/test_label", label = test_mask, masket=test_split_mask)
         # print(np.array(train_label).shape)
         # val_dataset = self.get_data(self.label_path, "val", "cityspace")
         # test_dataset = self.get_data(self.label_path, "test", "cityspace")
-        np.savez("./train_img", img = train_img)
-        np.savez("./train_label", label = mask, masket=split_mask)
+
 
 
 
