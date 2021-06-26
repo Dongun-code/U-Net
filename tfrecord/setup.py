@@ -21,7 +21,9 @@ class TfSerializer:
                 continue
             elif isinstance(value, np.ndarray):
                 # method 1: encode into raw bytes - fast but losing shape, 2 seconds to make training dataset
-                value = value.tobytes()
+                # print("bytes shape: ",value.shape)
+                # value = value.tobytes()
+                value = value.tostring()
                 # method 2: encode into png format - slow but keeping shape, 10 seconds to make training dataset
                 # value = tf.io.encode_png(value)
                 # value = value.numpy()  # BytesList won't unpack a tf.string from an EagerTensor.
